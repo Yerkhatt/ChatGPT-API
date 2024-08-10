@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Essay Evaluation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            white-space: pre-wrap; /* Preserve formatting */
+        }
+    </style>
+</head>
+<body>
+    <h1>Essay Evaluation Tool</h1>
+    <textarea id="inputText" placeholder="Enter your essay here..."></textarea>
+    <button onclick="submitEssay()">Submit</button>
+    <div id="output"></div>
+
+    <script>
+        async function submitEssay() {
+            const inputText = document.getElementById('inputText').value;
+
+            try {
+                const response = await fetch('http://localhost:8004/post_request', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: inputText }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    document.getElementById('output').innerText = 'Error: ' + (errorData.detail || 'An unknown error occurred.');
+                    return;
+                }
+
+                // Extract the response data
+                const data = await response.json();
+
+                // Convert the entire response dictionary to a string and display it
+                document.getElementById('output').innerText = data.response.content || 'No content available.';
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('output').innerText = 'Error: An error occurred while fetching data.';
+            }
+        }
+    </script>
+</body>
+</html>
